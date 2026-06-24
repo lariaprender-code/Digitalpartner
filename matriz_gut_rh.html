@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assessment de Priorização — Matriz GUT · RH</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #F5F5F5;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .page { max-width: 900px; margin: 0 auto; }
+
+  /* Modal de identificação */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  .modal-box {
+    background: #fff;
+    border-radius: 14px;
+    padding: 2rem;
+    width: 100%; max-width: 420px;
+    margin: 1rem;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  }
+  .modal-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+  .modal-dot { width: 10px; height: 10px; border-radius: 50%; background: #C8102E; flex-shrink: 0; }
+  .modal-title { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+  .modal-sub { font-size: 12px; color: #888; margin-top: 2px; }
+  .modal-label { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 6px; display: block; }
+  .modal-input {
+    width: 100%; height: 40px;
+    border: 1px solid #D8D8D8; border-radius: 8px;
+    padding: 0 12px; font-size: 14px; font-family: inherit;
+    color: #1a1a1a; background: #fff;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    margin-bottom: 14px;
+  }
+  .modal-input:focus { outline: none; border-color: #4A6CF7; box-shadow: 0 0 0 3px rgba(74,108,247,0.12); }
+  .modal-input.error { border-color: #C8102E; }
+  .modal-error { font-size: 12px; color: #C8102E; margin-top: -10px; margin-bottom: 12px; display: none; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 4px; }
+  .modal-divider { border: none; border-top: 1px solid #F0F0F0; margin: 16px 0; }
+  .admin-toggle { font-size: 12px; color: #aaa; cursor: pointer; text-align: center; margin-top: 10px; }
+  .admin-toggle:hover { color: #666; }
+  .admin-section { display: none; margin-top: 12px; }
+
+  /* Header */
+  .page-header {
+    background: #fff; border-radius: 12px;
+    padding: 1.75rem 2rem; margin-bottom: 1.25rem;
+    border: 1px solid #E8E8E8;
+  }
+  .header-top {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  }
+  .logo-area { display: flex; align-items: center; gap: 12px; }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: #C8102E; flex-shrink: 0; margin-top: 4px; }
+  .page-title { font-size: 20px; font-weight: 600; color: #1a1a1a; line-height: 1.3; }
+  .page-subtitle { font-size: 13px; color: #666; margin-top: 3px; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; }
+  .header-badge {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: #C8102E;
+    background: #FFF0F2; border: 1px solid #F5C6CC;
+    border-radius: 6px; padding: 4px 10px; white-space: nowrap;
+  }
+  .user-badge {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+    color: #1A5EA8; background: #EAF4FF; border: 1px solid #9BBFE0;
+    border-radius: 6px; padding: 4px 10px; white-space: nowrap;
+  }
+  .admin-badge {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+    color: #276749; background: #F0FBF4; border: 1px solid #A8D5B5;
+    border-radius: 6px; padding: 4px 10px; white-space: nowrap;
+  }
+
+  .instructions {
+    background: #F8F9FF; border-left: 3px solid #4A6CF7;
+    border-radius: 0 8px 8px 0; padding: 1rem 1.25rem;
+    margin-top: 1.25rem; font-size: 13px; color: #444; line-height: 1.6;
+  }
+  .instructions strong { color: #1a1a1a; }
+
+  .legend-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px; margin-top: 1.25rem;
+  }
+  .legend-card { background: #fff; border: 1px solid #E8E8E8; border-radius: 8px; padding: 10px 14px; }
+  .legend-card .dim { font-size: 12px; font-weight: 700; color: #C8102E; margin-bottom: 3px; }
+  .legend-card .desc { font-size: 12px; color: #555; line-height: 1.5; }
+
+  .scale-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 1rem; }
+  .pill { font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 1px solid; font-weight: 500; }
+  .pill-1 { background: #F0FBF4; color: #276749; border-color: #A8D5B5; }
+  .pill-2 { background: #EAF4FF; color: #1A5EA8; border-color: #9BBFE0; }
+  .pill-3 { background: #FFF8E6; color: #7A5200; border-color: #E6CC80; }
+  .pill-4 { background: #FFF0E6; color: #7A3000; border-color: #E6AC80; }
+  .pill-5 { background: #FFF0F2; color: #8B0000; border-color: #F5AABB; }
+
+  /* Tabela */
+  .table-wrap {
+    background: #fff; border-radius: 12px;
+    border: 1px solid #E8E8E8; overflow: hidden; margin-top: 1.25rem;
+  }
+  .table-header {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 90px;
+    background: #F7F7F7; border-bottom: 1px solid #E8E8E8; padding: 10px 20px;
+  }
+  .th {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+    text-transform: uppercase; color: #888; text-align: center;
+  }
+  .th:first-child { text-align: left; }
+
+  .project-row {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 90px;
+    align-items: center; padding: 10px 20px;
+    border-bottom: 1px solid #F0F0F0; transition: background 0.15s;
+  }
+  .project-row:last-child { border-bottom: none; }
+  .project-row:hover { background: #FAFAFA; }
+
+  .proj-name { font-size: 13px; font-weight: 500; color: #1a1a1a; line-height: 1.4; }
+  .proj-index { font-size: 11px; color: #aaa; font-weight: 400; margin-top: 1px; }
+
+  .score-cell { display: flex; justify-content: center; align-items: center; }
+  .score-cell select {
+    appearance: none; -webkit-appearance: none;
+    width: 52px; height: 34px; border: 1px solid #D8D8D8;
+    border-radius: 8px; background: #fff; font-size: 14px;
+    font-weight: 600; color: #1a1a1a; text-align: center;
+    cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+  }
+  .score-cell select:hover { border-color: #4A6CF7; }
+  .score-cell select:focus { outline: none; border-color: #4A6CF7; box-shadow: 0 0 0 3px rgba(74,108,247,0.12); }
+  .score-cell select.empty { color: #bbb; border-color: #E8E8E8; background: #FAFAFA; }
+
+  .gut-cell { display: flex; justify-content: center; align-items: center; }
+  .gut-badge {
+    min-width: 46px; height: 30px; border-radius: 8px;
+    font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, color 0.2s;
+  }
+  .gut-empty { background: #F0F0F0; color: #ccc; }
+  .gut-low   { background: #E8F5EE; color: #1A6B3C; }
+  .gut-mid   { background: #FFF3CD; color: #7A5200; }
+  .gut-high  { background: #FFE8D6; color: #7A3000; }
+  .gut-crit  { background: #FFE0E3; color: #8B0000; }
+
+  /* Ações */
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1.25rem; }
+  .btn {
+    height: 40px; padding: 0 20px; border-radius: 8px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: 1.5px solid; font-family: inherit; transition: all 0.15s;
+  }
+  .btn-primary { background: #C8102E; color: #fff; border-color: #C8102E; }
+  .btn-primary:hover { background: #A50D25; border-color: #A50D25; }
+  .btn-save { background: #1A5EA8; color: #fff; border-color: #1A5EA8; }
+  .btn-save:hover { background: #154C8C; border-color: #154C8C; }
+  .btn-secondary { background: #fff; color: #1a1a1a; border-color: #D8D8D8; }
+  .btn-secondary:hover { background: #F5F5F5; }
+  .btn-ghost { background: transparent; color: #666; border-color: #E0E0E0; }
+  .btn-ghost:hover { background: #F5F5F5; color: #1a1a1a; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #1a1a1a; color: #fff; padding: 10px 20px;
+    border-radius: 8px; font-size: 13px; font-weight: 500;
+    transition: transform 0.3s ease; z-index: 200; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Ranking */
+  .ranking-section {
+    background: #fff; border-radius: 12px; border: 1px solid #E8E8E8;
+    margin-top: 1.25rem; overflow: hidden; display: none;
+  }
+  .ranking-header {
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid #F0F0F0;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .ranking-title { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+  .ranking-sub { font-size: 12px; color: #888; margin-top: 2px; }
+
+  .ranking-row {
+    display: grid; grid-template-columns: 36px 1fr 90px;
+    align-items: center; gap: 12px; padding: 10px 20px;
+    border-bottom: 1px solid #F5F5F5;
+  }
+  .ranking-row:last-child { border-bottom: none; }
+  .rank-pos { font-size: 13px; font-weight: 700; color: #bbb; text-align: center; }
+  .rank-pos.top3 { color: #C8102E; }
+  .rank-name { font-size: 13px; color: #1a1a1a; font-weight: 500; }
+  .rank-detail { font-size: 11px; color: #aaa; }
+  .rank-gut { font-size: 14px; font-weight: 700; text-align: center; padding: 4px 8px; border-radius: 6px; }
+
+  /* Painel admin */
+  .admin-panel {
+    background: #fff; border-radius: 12px; border: 1px solid #A8D5B5;
+    margin-top: 1.25rem; overflow: hidden; display: none;
+  }
+  .admin-panel-header {
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid #F0F0F0;
+    background: #F0FBF4; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  .admin-panel-title { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+  .admin-panel-sub { font-size: 12px; color: #555; margin-top: 2px; }
+  .responses-table { width: 100%; border-collapse: collapse; }
+  .responses-table th {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+    text-transform: uppercase; color: #888; text-align: left;
+    padding: 8px 16px; background: #F7F7F7; border-bottom: 1px solid #E8E8E8;
+  }
+  .responses-table td {
+    font-size: 12px; color: #1a1a1a; padding: 8px 16px;
+    border-bottom: 1px solid #F5F5F5; vertical-align: middle;
+  }
+  .responses-table tr:last-child td { border-bottom: none; }
+  .responses-table tr:hover td { background: #FAFAFA; }
+  .no-responses { padding: 2rem; text-align: center; font-size: 13px; color: #aaa; }
+
+  .page-footer { text-align: center; padding: 1.5rem 0 0.5rem; font-size: 11px; color: #bbb; }
+
+  @media (max-width: 600px) {
+    .table-header, .project-row { grid-template-columns: 1fr 44px 44px 44px 60px; padding: 8px 12px; gap: 4px; }
+    .proj-name { font-size: 12px; }
+    .score-cell select { width: 40px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Modal de identificação -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-logo">
+      <div class="modal-dot"></div>
+      <div>
+        <div class="modal-title">Assessment Matriz GUT</div>
+        <div class="modal-sub">Diretoria de Recursos Humanos · 2026–2027</div>
+      </div>
+    </div>
+
+    <label class="modal-label" for="input-name">Seu nome completo</label>
+    <input class="modal-input" type="text" id="input-name" placeholder="Ex.: Ana Souza" autocomplete="name" />
+
+    <label class="modal-label" for="input-role">Cargo / área</label>
+    <input class="modal-input" type="text" id="input-role" placeholder="Ex.: Gerente de Talentos" />
+
+    <div id="name-error" class="modal-error">Por favor, preencha seu nome antes de continuar.</div>
+
+    <div class="modal-actions">
+      <button class="btn btn-primary" style="flex:1" onclick="startUser()">Começar avaliação</button>
+    </div>
+
+    <hr class="modal-divider">
+    <div class="admin-toggle" onclick="toggleAdminSection()">Acesso administrativo ▾</div>
+    <div class="admin-section" id="admin-section">
+      <label class="modal-label" style="margin-top:10px" for="input-admin-pass">Senha de administrador</label>
+      <input class="modal-input" type="password" id="input-admin-pass" placeholder="••••••" />
+      <button class="btn btn-secondary" style="width:100%" onclick="startAdmin()">Entrar como admin</button>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="main-content" style="display:none">
+
+  <!-- Cabeçalho -->
+  <div class="page-header">
+    <div class="header-top">
+      <div class="logo-area">
+        <div class="logo-dot"></div>
+        <div>
+          <div class="page-title">Assessment de Priorização — Matriz GUT</div>
+          <div class="page-subtitle">Roadmap de Transformação Digital · Diretoria de Recursos Humanos · 2026–2027</div>
+        </div>
+      </div>
+      <div class="badges">
+        <span class="header-badge">Offsite RH · Dir. RH</span>
+        <span id="user-badge" class="user-badge"></span>
+      </div>
+    </div>
+
+    <div class="instructions">
+      <strong>Como preencher:</strong> Avalie cada projeto nas três dimensões abaixo usando a escala de 1 a 5.
+      O score GUT é calculado automaticamente. Ao finalizar, clique em <strong>Salvar avaliação</strong>.
+    </div>
+
+    <div class="legend-grid">
+      <div class="legend-card">
+        <div class="dim">G — Gravidade</div>
+        <div class="desc">Qual o impacto se o projeto não for realizado?</div>
+      </div>
+      <div class="legend-card">
+        <div class="dim">U — Urgência</div>
+        <div class="desc">Qual o prazo antes que o problema se agrave?</div>
+      </div>
+      <div class="legend-card">
+        <div class="dim">T — Tendência</div>
+        <div class="desc">Como o problema evolui se nada for feito?</div>
+      </div>
+    </div>
+
+    <div class="scale-pills">
+      <span class="pill pill-1">1 — Mínimo</span>
+      <span class="pill pill-2">2 — Baixo</span>
+      <span class="pill pill-3">3 — Médio</span>
+      <span class="pill pill-4">4 — Alto</span>
+      <span class="pill pill-5">5 — Máximo</span>
+    </div>
+  </div>
+
+  <!-- Tabela de projetos -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <span class="th">Projeto</span>
+      <span class="th">G</span>
+      <span class="th">U</span>
+      <span class="th">T</span>
+      <span class="th">GUT</span>
+    </div>
+    <div id="projects-container"></div>
+  </div>
+
+  <!-- Ações do usuário -->
+  <div class="actions" id="user-actions">
+    <button class="btn btn-save" onclick="saveResponse()">Salvar avaliação</button>
+    <button class="btn btn-secondary" onclick="exportMyCSV()">Exportar minha avaliação (CSV)</button>
+    <button class="btn btn-ghost" onclick="resetAll()">Limpar</button>
+  </div>
+
+  <!-- Ações do admin (ocultas por padrão) -->
+  <div class="actions" id="admin-actions" style="display:none">
+    <button class="btn btn-primary" onclick="showRanking()">Gerar ranking consolidado</button>
+    <button class="btn btn-secondary" onclick="exportAllCSV()">Exportar todas as respostas (CSV)</button>
+    <button class="btn btn-ghost" onclick="clearAllData()">Limpar todos os dados</button>
+  </div>
+
+  <!-- Ranking (admin) -->
+  <div class="ranking-section" id="ranking-section">
+    <div class="ranking-header">
+      <div>
+        <div class="ranking-title">Ranking consolidado</div>
+        <div class="ranking-sub">Média das avaliações · Ordenado por score GUT médio</div>
+      </div>
+    </div>
+    <div id="ranking-list"></div>
+  </div>
+
+  <!-- Painel de respostas (admin) -->
+  <div class="admin-panel" id="admin-panel" style="display:none">
+    <div class="admin-panel-header">
+      <div>
+        <div class="admin-panel-title">Respostas recebidas</div>
+        <div class="admin-panel-sub" id="admin-panel-sub">Nenhuma resposta ainda</div>
+      </div>
+      <span class="admin-badge">Modo admin</span>
+    </div>
+    <div id="responses-container"></div>
+  </div>
+
+  <div class="page-footer">Grupo Aço Cearense · RH Digital · Assessment GUT</div>
+</div>
+
+<!-- Modal de exportação CSV -->
+<div id="csv-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:300; align-items:center; justify-content:center;">
+  <div style="background:#fff; border-radius:14px; padding:1.5rem; width:100%; max-width:580px; margin:1rem; box-shadow:0 8px 40px rgba(0,0,0,0.18); max-height:90vh; display:flex; flex-direction:column;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+      <div>
+        <div style="font-size:15px; font-weight:600; color:#1a1a1a;" id="csv-modal-title">Exportar CSV</div>
+        <div style="font-size:12px; color:#888; margin-top:2px;">Copie o conteúdo abaixo e cole no Excel, ou clique em Baixar arquivo</div>
+      </div>
+      <button onclick="closeCSVModal()" style="background:none; border:none; font-size:22px; cursor:pointer; color:#888; line-height:1; padding:4px 8px;">&#x2715;</button>
+    </div>
+    <textarea id="csv-content" readonly style="flex:1; min-height:260px; font-family:monospace; font-size:11px; border:1px solid #E0E0E0; border-radius:8px; padding:10px; resize:vertical; color:#1a1a1a; background:#FAFAFA; line-height:1.5; width:100%; box-sizing:border-box;"></textarea>
+    <div style="display:flex; gap:8px; margin-top:1rem; flex-wrap:wrap;">
+      <button class="btn btn-save" onclick="copyCSV()" id="copy-btn">Copiar tudo</button>
+      <button class="btn btn-secondary" onclick="tryDownloadCSV()" id="download-btn">Baixar arquivo .csv</button>
+      <button class="btn btn-ghost" onclick="closeCSVModal()">Fechar</button>
+    </div>
+    <div style="font-size:11px; color:#aaa; margin-top:10px; line-height:1.6;">
+      No Excel: Dados &#8594; De Texto/CSV &#8594; selecione o arquivo baixado. Ou cole direto numa planilha em branco.
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_PASSWORD = 'rh2025';
+const STORAGE_KEY = 'gut_responses_rh';
+
+const projects = [
+  "RH Data-Driven",
+  "Migração para SharePoint",
+  "Portal RH",
+  "Torre de controle",
+  "PoC InHire",
+  "Trilha capacitação RH em IA",
+  "Assistente de Comunicação GPT",
+  "Dash movimentações em aberto",
+  "IA generativa para RH",
+  "Atualização de escolaridades",
+  "Dashboard de Vagas",
+  "Dashboard de Comunicação",
+  "Avaliação do Gestor – Seleção",
+  "Desc. de cargos Pipeline",
+  "Categorização de Trilhas",
+  "Criação de agentes de IA p/ GD"
+];
+
+let currentUser = null;
+let isAdmin = false;
+
+function toggleAdminSection() {
+  const s = document.getElementById('admin-section');
+  s.style.display = s.style.display === 'none' ? 'block' : 'none';
+}
+
+function startUser() {
+  const name = document.getElementById('input-name').value.trim();
+  const role = document.getElementById('input-role').value.trim();
+  if (!name) {
+    document.getElementById('input-name').classList.add('error');
+    document.getElementById('name-error').style.display = 'block';
+    return;
+  }
+  currentUser = { name, role };
+  isAdmin = false;
+  document.getElementById('user-badge').textContent = name + (role ? ' · ' + role : '');
+  document.getElementById('modal-overlay').style.display = 'none';
+  document.getElementById('main-content').style.display = 'block';
+  buildTable();
+}
+
+function startAdmin() {
+  const pass = document.getElementById('input-admin-pass').value;
+  if (pass !== ADMIN_PASSWORD) {
+    document.getElementById('input-admin-pass').classList.add('error');
+    showToast('Senha incorreta.');
+    return;
+  }
+  currentUser = { name: 'Administrador', role: 'Admin' };
+  isAdmin = true;
+  document.getElementById('user-badge').textContent = '';
+  document.getElementById('modal-overlay').style.display = 'none';
+  document.getElementById('main-content').style.display = 'block';
+  document.getElementById('user-actions').style.display = 'none';
+  document.getElementById('admin-actions').style.display = 'flex';
+  document.getElementById('admin-panel').style.display = 'block';
+  buildTable();
+  renderResponsesPanel();
+}
+
+function makeSelect(id) {
+  let s = `<select id="${id}" class="empty" onchange="onSelectChange(this, '${id.split('-').slice(0,2).join('-')}')">`;
+  s += `<option value="" disabled selected>–</option>`;
+  for (let i = 1; i <= 5; i++) s += `<option value="${i}">${i}</option>`;
+  return s + '</select>';
+}
+
+function onSelectChange(el, prefix) {
+  el.classList.remove('empty');
+  updateGUT(prefix);
+}
+
+function gutClass(gut) {
+  if (!gut || gut === 0) return 'gut-empty';
+  if (gut <= 20)  return 'gut-low';
+  if (gut <= 64)  return 'gut-mid';
+  if (gut <= 100) return 'gut-high';
+  return 'gut-crit';
+}
+
+function updateGUT(prefix) {
+  const gEl = document.getElementById(prefix+'-g');
+  const uEl = document.getElementById(prefix+'-u');
+  const tEl = document.getElementById(prefix+'-t');
+  const g = gEl.value ? +gEl.value : null;
+  const u = uEl.value ? +uEl.value : null;
+  const t = tEl.value ? +tEl.value : null;
+  const el = document.getElementById(prefix+'-gut');
+  if (g && u && t) {
+    const gut = g * u * t;
+    el.textContent = gut;
+    el.className = 'gut-badge ' + gutClass(gut);
+  } else {
+    el.textContent = '–';
+    el.className = 'gut-badge gut-empty';
+  }
+}
+
+function buildTable() {
+  const container = document.getElementById('projects-container');
+  container.innerHTML = '';
+  projects.forEach((name, i) => {
+    const p = `proj-${i}`;
+    const row = document.createElement('div');
+    row.className = 'project-row';
+    row.innerHTML = `
+      <div>
+        <div class="proj-name">${name}</div>
+        <div class="proj-index">Projeto ${String(i+1).padStart(2,'0')}</div>
+      </div>
+      <div class="score-cell">${makeSelect(p+'-g')}</div>
+      <div class="score-cell">${makeSelect(p+'-u')}</div>
+      <div class="score-cell">${makeSelect(p+'-t')}</div>
+      <div class="gut-cell"><span class="gut-badge gut-empty" id="${p}-gut">–</span></div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function getResponses() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function saveResponses(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function saveResponse() {
+  const scores = projects.map((_, i) => {
+    const p = `proj-${i}`;
+    const g = document.getElementById(p+'-g').value;
+    const u = document.getElementById(p+'-u').value;
+    const t = document.getElementById(p+'-t').value;
+    return { g: g ? +g : null, u: u ? +u : null, t: t ? +t : null };
+  });
+
+  const filled = scores.filter(s => s.g && s.u && s.t).length;
+  if (filled < projects.length) {
+    showToast(`Preencha todos os campos antes de salvar. (${filled}/${projects.length} avaliados)`);
+    return;
+  }
+
+  const responses = getResponses();
+  const existing = responses.findIndex(r => r.name === currentUser.name);
+  const entry = {
+    name: currentUser.name,
+    role: currentUser.role || '',
+    savedAt: new Date().toLocaleString('pt-BR'),
+    scores
+  };
+
+  if (existing >= 0) {
+    responses[existing] = entry;
+    showToast('Avaliação atualizada com sucesso!');
+  } else {
+    responses.push(entry);
+    showToast('Avaliação salva com sucesso!');
+  }
+
+  saveResponses(responses);
+}
+
+function renderResponsesPanel() {
+  const responses = getResponses();
+  const sub = document.getElementById('admin-panel-sub');
+  const container = document.getElementById('responses-container');
+  sub.textContent = `${responses.length} resposta${responses.length !== 1 ? 's' : ''} recebida${responses.length !== 1 ? 's' : ''}`;
+
+  if (responses.length === 0) {
+    container.innerHTML = '<div class="no-responses">Nenhuma avaliação salva ainda.</div>';
+    return;
+  }
+
+  let html = `<div style="overflow-x:auto"><table class="responses-table">
+    <thead><tr>
+      <th>Nome</th><th>Cargo</th><th>Salvo em</th>
+      <th style="text-align:center">Projetos avaliados</th>
+    </tr></thead><tbody>`;
+
+  responses.forEach(r => {
+    const filled = r.scores.filter(s => s.g && s.u && s.t).length;
+    html += `<tr>
+      <td><strong>${r.name}</strong></td>
+      <td>${r.role || '—'}</td>
+      <td>${r.savedAt}</td>
+      <td style="text-align:center">${filled}/${projects.length}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
+}
+
+function showRanking() {
+  const responses = getResponses();
+  renderResponsesPanel();
+
+  if (responses.length === 0) {
+    showToast('Nenhuma resposta para gerar ranking.');
+    return;
+  }
+
+  const averages = projects.map((name, i) => {
+    const vals = responses
+      .map(r => r.scores[i])
+      .filter(s => s && s.g && s.u && s.t)
+      .map(s => s.g * s.u * s.t);
+    const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+    return { name, avg: Math.round(avg), count: vals.length };
+  }).sort((a, b) => b.avg - a.avg);
+
+  const list = document.getElementById('ranking-list');
+  list.innerHTML = '';
+  averages.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'ranking-row';
+    row.innerHTML = `
+      <div class="rank-pos ${idx < 3 ? 'top3' : ''}">${idx+1}º</div>
+      <div>
+        <div class="rank-name">${item.name}</div>
+        <div class="rank-detail">Média de ${item.count} avaliação${item.count !== 1 ? 'ões' : ''}</div>
+      </div>
+      <div class="rank-gut ${gutClass(item.avg)}">${item.avg}</div>
+    `;
+    list.appendChild(row);
+  });
+
+  const sec = document.getElementById('ranking-section');
+  sec.style.display = 'block';
+  sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+let _csvFilename = '';
+
+function exportMyCSV() {
+  const scores = projects.map((_, i) => {
+    const p = `proj-${i}`;
+    const g = document.getElementById(p+'-g').value;
+    const u = document.getElementById(p+'-u').value;
+    const t = document.getElementById(p+'-t').value;
+    return { g: g ? +g : null, u: u ? +u : null, t: t ? +t : null };
+  });
+
+  const filled = scores.filter(s => s.g && s.u && s.t).length;
+  if (filled === 0) {
+    showToast('Preencha ao menos um projeto antes de exportar.');
+    return;
+  }
+
+  let csv = 'Projeto,G (Gravidade),U (Urgencia),T (Tendencia),GUT (GxUxT)\n';
+
+  projects.forEach((name, i) => {
+    const s = scores[i];
+    if (s.g && s.u && s.t) {
+      csv += `"${name}",${s.g},${s.u},${s.t},${s.g * s.u * s.t}\n`;
+    } else {
+      csv += `"${name}",,,\n`;
+    }
+  });
+
+  csv += `\nAvaliador,"${currentUser.name}"\n`;
+  csv += `Cargo,"${currentUser.role || ''}"\n`;
+  csv += `Exportado em,"${new Date().toLocaleString('pt-BR')}"\n`;
+
+  _csvFilename = `gut_${currentUser.name.replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.csv`;
+  document.getElementById('csv-modal-title').textContent = 'Exportar minha avaliação';
+  document.getElementById('csv-content').value = csv;
+  document.getElementById('csv-modal').style.display = 'flex';
+}
+
+function exportAllCSV() {
+  const responses = getResponses();
+  if (responses.length === 0) { showToast('Nenhuma resposta para exportar.'); return; }
+
+  let csv = 'Nome,Cargo,Salvo em,' + projects.map(p => `"${p} - G","${p} - U","${p} - T","${p} - GUT"`).join(',') + '\n';
+
+  responses.forEach(r => {
+    const row = [
+      `"${r.name}"`,
+      `"${r.role || ''}"`,
+      `"${r.savedAt}"`,
+      ...r.scores.map(s => {
+        if (!s || !s.g) return ',,,';
+        return `${s.g},${s.u},${s.t},${s.g * s.u * s.t}`;
+      })
+    ];
+    csv += row.join(',') + '\n';
+  });
+
+  _csvFilename = `gut_respostas_${new Date().toISOString().slice(0,10)}.csv`;
+  document.getElementById('csv-modal-title').textContent = 'Exportar todas as respostas';
+  document.getElementById('csv-content').value = csv;
+  document.getElementById('csv-modal').style.display = 'flex';
+}
+
+function clearAllData() {
+  if (!confirm('Tem certeza que deseja apagar todas as respostas salvas? Esta ação não pode ser desfeita.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  document.getElementById('ranking-section').style.display = 'none';
+  renderResponsesPanel();
+  showToast('Todos os dados foram apagados.');
+}
+
+function resetAll() {
+  projects.forEach((_, i) => {
+    const p = `proj-${i}`;
+    ['g','u','t'].forEach(d => {
+      const el = document.getElementById(p+'-'+d);
+      el.value = '';
+      el.classList.add('empty');
+    });
+    const gut = document.getElementById(p+'-gut');
+    gut.textContent = '–';
+    gut.className = 'gut-badge gut-empty';
+  });
+}
+
+function closeCSVModal() {
+  document.getElementById('csv-modal').style.display = 'none';
+}
+
+function copyCSV() {
+  const ta = document.getElementById('csv-content');
+  ta.select();
+  ta.setSelectionRange(0, 99999);
+  try {
+    document.execCommand('copy');
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar tudo', 2000);
+  } catch(e) {
+    showToast('Use Ctrl+A e Ctrl+C para copiar.');
+  }
+}
+
+function tryDownloadCSV() {
+  const csv = document.getElementById('csv-content').value;
+  try {
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csv);
+    a.download = _csvFilename || 'gut_export.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('Download iniciado!');
+  } catch(e) {
+    showToast('Download bloqueado pelo navegador. Use "Copiar tudo".');
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
